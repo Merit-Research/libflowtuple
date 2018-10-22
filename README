@@ -1,0 +1,4 @@
+libflowtuple
+============
+
+libflowtuple is a library to read CAIDA's corsaro flowtuple format.
