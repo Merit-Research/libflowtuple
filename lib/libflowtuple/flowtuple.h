@@ -69,6 +69,44 @@ flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record);
 
 void flowtuple_record_free(flowtuple_record_t *record);
 
+uint8_t flowtuple_header_get_version_major(flowtuple_header_t *header);
+uint8_t flowtuple_header_get_version_minor(flowtuple_header_t *header);
+uint32_t flowtuple_header_get_local_init_time(flowtuple_header_t *header);
+uint16_t flowtuple_header_get_interval_length(flowtuple_header_t *header);
+uint16_t flowtuple_header_get_traceuri_len(flowtuple_header_t *header);
+const char *flowtuple_header_get_traceuri(flowtuple_header_t *header);
+uint16_t *flowtuple_header_get_plugin_count(flowtuple_header_t *header);
+uint32_t *flowtuple_header_get_plugins(flowtuple_header_t *header);
+
+uint64_t flowtuple_trailer_get_packet_count(flowtuple_trailer_t *trailer);
+uint64_t flowtuple_trailer_get_accepted_count(flowtuple_trailer_t *trailer);
+uint64_t flowtuple_trailer_get_dropped_count(flowtuple_trailer_t *trailer);
+uint32_t flowtuple_trailer_get_first_packet_time(flowtuple_trailer_t *trailer);
+uint32_t flowtuple_trailer_get_last_packet_time(flowtuple_trailer_t *trailer);
+uint32_t flowtuple_trailer_get_local_final_time(flowtuple_trailer_t *trailer);
+uint32_t flowtuple_trailer_get_runtime(flowtuple_trailer_t *trailer);
+
+uint16_t flowtuple_interval_get_number(flowtuple_interval_t *interval);
+uint32_t flowtuple_interval_get_time(flowtuple_interval_t *interval);
+
+uint32_t flowtuple_class_get_magic(flowtuple_class_t *ftclass);
+uint16_t flowtuple_class_get_class_type(flowtuple_class_t *ftclass);
+uint32_t flowtuple_class_get_key_count(flowtuple_class_t *ftclass);
+
+flowtuple_class_t *flowtuple_data_get_class_start(flowtuple_data_t *data);
+uint32_t flowtuple_data_get_number(flowtuple_data_t *data);
+uint32_t flowtuple_data_get_src_ip(flowtuple_data_t *data);
+uint32_t flowtuple_data_get_dest_ip_int(flowtuple_data_t *data);
+flowtuple_slash_eight_t flowtuple_data_get_dest_ip_slash_eight(flowtuple_data_t *data);
+uint16_t flowtuple_data_get_src_port(flowtuple_data_t *data);
+uint16_t flowtuple_data_get_dest_port(flowtuple_data_t *data);
+uint8_t flowtuple_data_get_protocol(flowtuple_data_t *data);
+uint8_t flowtuple_data_get_ttl(flowtuple_data_t *data);
+uint8_t flowtuple_data_get_tcp_flags(flowtuple_data_t *data);
+uint16_t flowtuple_data_get_ip_len(flowtuple_data_t *data);
+uint32_t flowtuple_data_get_packet_count(flowtuple_data_t *data);
+int flowtuple_data_is_slash_eight(flowtuple_data_t *data);
+
 #ifdef __cplusplus
 }
 #endif
