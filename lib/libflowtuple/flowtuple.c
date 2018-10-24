@@ -89,3 +89,16 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
             break;
     }
 }
+
+const char *flowtuple_handle_get_uri(flowtuple_handle_t *handle) {
+    ASSERT(handle != NULL, return NULL);
+    return handle->uri;
+}
+
+flowtuple_record_t *flowtuple_handle_get_last_record(flowtuple_handle_t *handle) {
+    ASSERT(handle != NULL, return NULL);
+    flowtuple_record_t *ret;
+    MALLOC(ret, sizeof(flowtuple_record_t), return NULL);
+    memcpy(ret, &(handle->last_record), sizeof(flowtuple_record_t));
+    return ret;
+}

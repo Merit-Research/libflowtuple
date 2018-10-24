@@ -55,7 +55,17 @@ flowtuple_handle_t *flowtuple_initialize(const char *filename);
 void flowtuple_release(flowtuple_handle_t *handle);
 
 flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle);
+
+const char *flowtuple_handle_get_uri(flowtuple_handle_t *handle);
+flowtuple_record_t *flowtuple_handle_get_last_record(flowtuple_handle_t *handle);
+
 flowtuple_record_type_t flowtuple_record_get_type(flowtuple_record_t *record);
+
+flowtuple_header_t *flowtuple_record_get_header(flowtuple_record_t *record);
+flowtuple_trailer_t *flowtuple_record_get_trailer(flowtuple_record_t *record);
+flowtuple_interval_t *flowtuple_record_get_interval(flowtuple_record_t *record);
+flowtuple_class_t *flowtuple_record_get_class(flowtuple_record_t *record);
+flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record);
 
 void flowtuple_record_free(flowtuple_record_t *record);
 

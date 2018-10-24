@@ -36,6 +36,36 @@ void flowtuple_record_free(flowtuple_record_t *record) {
     FREE(record);
 }
 
+flowtuple_record_type_t flowtuple_record_get_type(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return FLOWTUPLE_RECORD_TYPE_NULL);
+    return record->type;
+}
+
+flowtuple_header_t *flowtuple_record_get_header(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return NULL);
+    return &(record->record.header);
+}
+
+flowtuple_trailer_t *flowtuple_record_get_trailer(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return NULL);
+    return &(record->record.trailer);
+}
+
+flowtuple_interval_t *flowtuple_record_get_interval(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return NULL);
+    return &(record->record.interval);
+}
+
+flowtuple_class_t *flowtuple_record_get_class(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return NULL);
+    return &(record->record.ftclass);
+}
+
+flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record) {
+    ASSERT(record != NULL, return NULL);
+    return &(record->record.data);
+}
+
 flowtuple_record_t *_flowtuple_read_header(flowtuple_handle_t *handle) {
     uint8_t *buf;
     flowtuple_header_t header;
