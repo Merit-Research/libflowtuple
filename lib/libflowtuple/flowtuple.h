@@ -74,7 +74,7 @@ uint32_t flowtuple_header_get_local_init_time(flowtuple_header_t *header);
 uint16_t flowtuple_header_get_interval_length(flowtuple_header_t *header);
 uint16_t flowtuple_header_get_traceuri_len(flowtuple_header_t *header);
 const char *flowtuple_header_get_traceuri(flowtuple_header_t *header);
-uint16_t *flowtuple_header_get_plugin_count(flowtuple_header_t *header);
+uint16_t flowtuple_header_get_plugin_count(flowtuple_header_t *header);
 uint32_t *flowtuple_header_get_plugins(flowtuple_header_t *header);
 
 uint64_t flowtuple_trailer_get_packet_count(flowtuple_trailer_t *trailer);

@@ -51,7 +51,7 @@ const char *flowtuple_header_get_traceuri(flowtuple_header_t *header) {
     return (const char *)(header->traceuri);
 }
 
-uint16_t *flowtuple_header_get_plugin_count(flowtuple_header_t *header) {
+uint16_t flowtuple_header_get_plugin_count(flowtuple_header_t *header) {
     ASSERT(header != NULL, return 0);
     return header->plugin_cnt;
 }
