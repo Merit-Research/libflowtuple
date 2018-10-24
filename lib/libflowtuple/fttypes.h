@@ -35,7 +35,7 @@ struct _flowtuple_header_t {
     uint16_t traceuri_len;
     uint8_t *traceuri;
     uint16_t plugin_cnt;
-    uint8_t *plugins;
+    uint32_t *plugins;
 };
 
 struct _flowtuple_trailer_t {
@@ -57,10 +57,12 @@ struct _flowtuple_class_t {
     uint32_t magic; /* this magic is important */
     uint16_t class_type;
     uint32_t key_count;
+
+    int is_start;
 };
 
 struct _flowtuple_data_t {
-    struct _flowtuple_class_t *class_start;
+    struct _flowtuple_class_t class_start;
     uint32_t number;
 
     uint32_t src_ip;
@@ -94,6 +96,7 @@ struct _flowtuple_record_t {
 struct _flowtuple_handle_t {
     char *uri;
     io_t *io;
+    flowtuple_record_t last_record;
 };
 
 #endif

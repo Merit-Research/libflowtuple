@@ -26,12 +26,14 @@
 #include "flowtuple.h"
 #include "fttypes.h"
 #include "util.h"
+#include "record.h"
 
 flowtuple_handle_t *flowtuple_initialize(const char *filename) {
     flowtuple_handle_t *handle = NULL;
 
     CALLOC(handle, 1, sizeof(flowtuple_handle_t), return NULL);
 
+    CALLOC(handle->uri, strlen(filename) + 1, sizeof(char), return NULL);
     strcpy(handle->uri, filename);
 
     handle->io = wandio_create(filename);
@@ -57,4 +59,33 @@ void flowtuple_release(flowtuple_handle_t *handle) {
     }
 
     FREE(handle);
+}
+
+flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
+    ASSERT(handle != NULL, return NULL);
+
+    int type;
+    uint8_t buf[5];
+
+    check:
+    type = _flowtuple_check_magic(handle);
+    switch (type) {
+        case 1:
+            wandio_read(handle->io, buf, 4);
+            goto check;
+        case 2:
+            return _flowtuple_read_interval(handle);
+        case 3:
+            return _flowtuple_read_header(handle);
+        case 4:
+            return _flowtuple_read_trailer(handle);
+        case 5:
+        case 6:
+            return _flowtuple_read_flowtuple_class(handle);
+        case 7:
+        case 0:
+            return _flowtuple_read_flowtuple_data(handle);
+        default:
+            break;
+    }
 }

@@ -34,16 +34,18 @@ int _flowtuple_check_magic(flowtuple_handle_t *handle) {
         ret = 0;
     } else if (strcmp(buf, "EDGR") == 0) {
         ret = 1;
-    } else if (strcmp(buf, "HEAD") == 0) {
+    } else if (strcmp(buf, "INTR") == 0) {
         ret = 2;
-    } else if (strcmp(buf, "FOOT") == 0) {
+    } else if (strcmp(buf, "HEAD") == 0) {
         ret = 3;
-    } else if (strcmp(buf, "SIXT") == 0) {
+    } else if (strcmp(buf, "FOOT") == 0) {
         ret = 4;
-    } else if (strcmp(buf, "SIXU") == 0) {
+    } else if (strcmp(buf, "SIXT") == 0) {
         ret = 5;
-    } else if (strcmp(buf, "DATA") == 0) {
+    } else if (strcmp(buf, "SIXU") == 0) {
         ret = 6;
+    } else if (strcmp(buf, "DATA") == 0) {
+        ret = 7;
     } else {
         ret = 0;
     }
@@ -52,10 +54,12 @@ int _flowtuple_check_magic(flowtuple_handle_t *handle) {
     return ret;
 }
 
-void _flowtuple_bytes_to_int(const char *bytes, size_t len, uint32_t *ret) {
-    *ret = 0;
+uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len) {
+    uint64_t ret = 0;
 
     for (size_t i = 0; i < len; i++) {
-        *ret |= (uint32_t)(bytes[i] << (8 * (len - 1 - i)));
+        ret |= (uint64_t)(bytes[i] << (8 * (len - 1 - i)));
     }
+
+    return ret;
 }

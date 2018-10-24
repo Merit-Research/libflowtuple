@@ -1,5 +1,5 @@
 /*
- *  util.h
+ *  record.h
  *
  *  Copyright (c) 2018 Merit Network, Inc.
  *  Copyright (c) 2018 The Regents of the University of California.
@@ -18,21 +18,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UTIL_H
-#define UTIL_H
-
-#include <inttypes.h>
-#include <stdlib.h>
+#ifndef RECORD_H
+#define RECORD_H
 
 #include "flowtuple.h"
+#include "fttypes.h"
 
-#define MALLOC(p, s, action) do { p = malloc(s); if (p == NULL) { _action; } } while(0)
-#define CALLOC(p, l, s, action) do { p = calloc(l, s); if (p == NULL) { action; } } while(0)
-#define FREE(p) do { free(p); p = NULL; } while(0)
-
-#define ASSERT(cond, action) do { if (!(cond)) { action; } } while(0)
-
-int _flowtuple_check_magic(flowtuple_handle_t *handle);
-uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len);
+flowtuple_record_t *_flowtuple_read_interval(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_read_header(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_read_trailer(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_read_flowtuple_class(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_read_flowtuple_data(flowtuple_handle_t *handle);
 
 #endif

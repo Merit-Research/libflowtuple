@@ -31,6 +31,7 @@ extern "C" {
 typedef enum _flowtuple_record_type_t {
     FLOWTUPLE_RECORD_TYPE_NULL,
     FLOWTUPLE_RECORD_TYPE_HEADER,
+    FLOWTUPLE_RECORD_TYPE_INTERVAL,
     FLOWTUPLE_RECORD_TYPE_TRAILER,
     FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS,
     FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA,
@@ -56,6 +57,7 @@ void flowtuple_release(flowtuple_handle_t *handle);
 flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle);
 flowtuple_record_type_t flowtuple_record_get_type(flowtuple_record_t *record);
 
+void flowtuple_record_free(flowtuple_record_t *record);
 
 #ifdef __cplusplus
 }
