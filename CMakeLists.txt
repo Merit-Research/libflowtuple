@@ -4,7 +4,7 @@ project(libflowtuple C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS -lwandio)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-files/cmake")
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${libflowtuple_BINARY_DIR}/bin)
 endif()
@@ -12,7 +12,7 @@ endif()
 #
 # Version - read from 'version' file.
 #
-file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/build/version _version)
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-files/version _version)
 string(REGEX REPLACE
         "^([0-9])[0-9][0-9][0-9][0-9][0-9][0-9][a-z]*$" "\\1" _major ${_version})
 string(REGEX REPLACE
