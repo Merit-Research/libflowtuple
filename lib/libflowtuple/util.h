@@ -26,7 +26,7 @@
 
 #include "flowtuple.h"
 
-#define MALLOC(p, s, action) do { p = malloc(s); if (p == NULL) { _action; } } while(0)
+#define MALLOC(p, s, action) do { p = malloc(s); if (p == NULL) { action; } } while(0)
 #define CALLOC(p, l, s, action) do { p = calloc(l, s); if (p == NULL) { action; } } while(0)
 #define FREE(p) do { free(p); p = NULL; } while(0)
 
