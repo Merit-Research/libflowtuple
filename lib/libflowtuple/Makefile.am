@@ -14,4 +14,6 @@ libflowtuple_la_SOURCES = \
 	trailer.c \
 	util.h util.c
 
-libflowtuple_la_LDFLAGS = -version-info $(LIB_VERSION_INFO)
+libflowtuple_la_LDFLAGS = -no-undefined -version-info $(LIB_VERSION_INFO)
+
+libflowtuple_la_LIBADD = $(LTLIBINTL)

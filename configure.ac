@@ -18,7 +18,7 @@ AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE([1.11 foreign])
 AM_SILENT_RULES([yes])
 
-LT_INIT
+LT_INIT([disable-static])
 
 LIB_VERSION_INFO="lib_version_major:lib_version_minor:lib_version_patch"
 
