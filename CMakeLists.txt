@@ -37,6 +37,8 @@ if(NOT WANDIO)
   message(FATAL_ERROR "libwandio not found")
 endif()
 
+include_directories(lib/libflowtuple)
+
 # include(CreatePkgConfigFile)
 
 add_library(flowtuple SHARED
@@ -53,5 +55,10 @@ add_library(flowtuple SHARED
         lib/libflowtuple/interval.c
         lib/libflowtuple/trailer.c)
 
+add_executable(flow2ascii tools/flow2ascii.c)
+target_link_libraries(flow2ascii flowtuple)
+
 install(FILES lib/libflowtuple/flowtuple.h DESTINATION include)
-install(TARGETS flowtuple LIBRARY DESTINATION lib)
+install(TARGETS flowtuple flow2ascii
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
