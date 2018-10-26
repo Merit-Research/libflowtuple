@@ -128,7 +128,7 @@ void data_print(flowtuple_data_t *data, uint8_t first_octet) {
            flowtuple_data_get_ttl(data),
            flowtuple_data_get_tcp_flags(data),
            flowtuple_data_get_ip_len(data),
-           flowtuple_data_get_number(data));
+           flowtuple_data_get_packet_count(data));
 }
 
 void usage(const char *program_name) {
