@@ -24,7 +24,6 @@
 #include <getopt.h>
 
 #include <flowtuple.h>
-#include <fttypes.h>
 
 static const struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
