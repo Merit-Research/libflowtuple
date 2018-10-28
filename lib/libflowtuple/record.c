@@ -66,7 +66,7 @@ flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record) {
     return &(record->record.data);
 }
 
-flowtuple_record_t *_flowtuple_read_header(flowtuple_handle_t *handle) {
+flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
     uint8_t *buf;
     flowtuple_header_t header;
     flowtuple_record_t *ret;
@@ -113,7 +113,7 @@ flowtuple_record_t *_flowtuple_read_header(flowtuple_handle_t *handle) {
     return ret;
 }
 
-flowtuple_record_t *_flowtuple_read_interval(flowtuple_handle_t *handle) {
+flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle) {
     uint8_t *buf;
     flowtuple_interval_t interval;
     flowtuple_record_t *ret;
@@ -133,7 +133,7 @@ flowtuple_record_t *_flowtuple_read_interval(flowtuple_handle_t *handle) {
     return ret;
 }
 
-flowtuple_record_t *_flowtuple_read_trailer(flowtuple_handle_t *handle) {
+flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle) {
     uint8_t *buf;
     flowtuple_trailer_t trailer;
     flowtuple_record_t *ret;
@@ -158,7 +158,7 @@ flowtuple_record_t *_flowtuple_read_trailer(flowtuple_handle_t *handle) {
     return ret;
 }
 
-flowtuple_record_t *_flowtuple_read_flowtuple_class(flowtuple_handle_t *handle) {
+flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle) {
     uint8_t *buf;
     flowtuple_class_t ftclass;
     flowtuple_record_t *ret;
@@ -199,7 +199,7 @@ flowtuple_record_t *_flowtuple_read_flowtuple_class(flowtuple_handle_t *handle) 
     return ret;
 }
 
-flowtuple_record_t *_flowtuple_read_flowtuple_data(flowtuple_handle_t *handle) {
+flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
     ASSERT(handle != NULL, return NULL);
 
     uint8_t *buf;

@@ -74,17 +74,17 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
             wandio_read(handle->io, buf, 4);
             goto check;
         case 2:
-            return _flowtuple_read_interval(handle);
+            return _flowtuple_record_read_interval(handle);
         case 3:
-            return _flowtuple_read_header(handle);
+            return _flowtuple_record_read_header(handle);
         case 4:
-            return _flowtuple_read_trailer(handle);
+            return _flowtuple_record_read_trailer(handle);
         case 5:
         case 6:
-            return _flowtuple_read_flowtuple_class(handle);
+            return _flowtuple_record_read_class(handle);
         case 7:
         case 0:
-            return _flowtuple_read_flowtuple_data(handle);
+            return _flowtuple_record_read_data(handle);
         default:
             break;
     }

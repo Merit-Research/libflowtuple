@@ -24,10 +24,10 @@
 #include "flowtuple.h"
 #include "fttypes.h"
 
-flowtuple_record_t *_flowtuple_read_interval(flowtuple_handle_t *handle);
-flowtuple_record_t *_flowtuple_read_header(flowtuple_handle_t *handle);
-flowtuple_record_t *_flowtuple_read_trailer(flowtuple_handle_t *handle);
-flowtuple_record_t *_flowtuple_read_flowtuple_class(flowtuple_handle_t *handle);
-flowtuple_record_t *_flowtuple_read_flowtuple_data(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle);
+flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle);
 
 #endif
