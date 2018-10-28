@@ -202,8 +202,7 @@ int main(int argc, char **argv) {
         return 3;
     }
 
-    r = flowtuple_get_next(h);
-    while (r != NULL) {
+    while ((r = flowtuple_get_next(h)) != NULL) {
         type = flowtuple_record_get_type(r);
 
         switch (type) {
@@ -238,7 +237,6 @@ int main(int argc, char **argv) {
         }
 
         flowtuple_record_free(r);
-        r = flowtuple_get_next(h);
     }
 
     fail:
