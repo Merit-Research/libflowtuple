@@ -25,18 +25,21 @@
 
 #include <flowtuple.h>
 
+/* long getopt options */
 static const struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
     { "octet", optional_argument, NULL, 'o' },
     { NULL, 0, NULL, 0 },
 };
 
+/* take integer and convert to array of octets */
 void ntoa(uint32_t src, uint8_t *dest) {
     for (int i = 0; i < 4; i++) {
         dest[i] = (uint8_t)(src >> (8 * (3 - i)));
     }
 }
 
+/* print header object */
 void header_print(flowtuple_header_t *header) {
     const char *traceuri;
     const uint32_t *plugins;
@@ -62,6 +65,7 @@ void header_print(flowtuple_header_t *header) {
     }
 }
 
+/* print interval object */
 void interval_print(flowtuple_interval_t *interval, int is_start) {
     char *tails[] = { "_END", "_START" };
     printf("# CORSARO_INTERVAL%s %d %d\n",
@@ -69,6 +73,7 @@ void interval_print(flowtuple_interval_t *interval, int is_start) {
         flowtuple_interval_get_time(interval));
 }
 
+/* print trailer object */
 void trailer_print(flowtuple_trailer_t *trailer) {
     uint64_t ac = flowtuple_trailer_get_accepted_count(trailer);
     uint64_t dc = flowtuple_trailer_get_dropped_count(trailer);
@@ -88,6 +93,7 @@ void trailer_print(flowtuple_trailer_t *trailer) {
     printf("# CORSARO_RUNTIME %d\n", flowtuple_trailer_get_runtime(trailer));
 }
 
+/* print class object */
 void class_print(flowtuple_class_t *ftclass, int is_start) {
     char *starts[] = { "END", "START" };
     char *class_types[] = { "flowtuple_backscatter", "flowtuple_icmpreq", "flowtuple_other" };
@@ -101,6 +107,7 @@ void class_print(flowtuple_class_t *ftclass, int is_start) {
     }
 }
 
+/* print data object */
 void data_print(flowtuple_data_t *data, uint8_t first_octet) {
     uint8_t src_ip[4];
     uint8_t dst_ip[4];
@@ -130,23 +137,24 @@ void data_print(flowtuple_data_t *data, uint8_t first_octet) {
            flowtuple_data_get_packet_count(data));
 }
 
+/* print usage */
 void usage(const char *program_name) {
     printf("Usage: %s [-o octet] inputfile\n", program_name);
 }
 
 int main(int argc, char **argv) {
-    flowtuple_handle_t *h;
-    flowtuple_record_t *r;
-    flowtuple_record_type_t type;
-    void *data;
-    char *filename = NULL;
-    int inter_start = 1;
-    int class_start = 1;
-    int first_octet = 0;
-    int index;
-    int c;
-    char *tmp;
+    flowtuple_handle_t *h;        /* handle */
+    flowtuple_record_t *r;        /* current record */
+    flowtuple_record_type_t type; /* record type */
+    void *data;                   /* record data */
+    char *filename = NULL;        /* file name */
+    int inter_start = 1;          /* interval start or end? */
+    int class_start = 1;          /* class start or end? */
+    int first_octet = 0;          /* first octet for slash eight */
+    int c;                        /* getopt option */
+    char *tmp;                    /* getopt tmp string */
 
+    /* we expect arguments, always */
     if (argc < 2) {
         usage(argv[0]);
         return 1;
@@ -155,9 +163,11 @@ int main(int argc, char **argv) {
     while ((c = getopt_long(argc, argv, ":ho:", long_opts, NULL)) != -1) {
         switch (c) {
             case 'h':
+                /* help */
                 usage(argv[0]);
                 return 0;
             case 'o':
+                /* octet */
                 if (optarg != NULL) {
                     first_octet = (int)strtol(optarg, &tmp, 10);
                 } else {
@@ -188,7 +198,8 @@ int main(int argc, char **argv) {
         }
     }
 
-    for (index = optind; index < argc; index++) {
+    /* get non-getopt options */
+    for (int index = optind; index < argc; index++) {
         if (filename != NULL) {
             break;
         }
@@ -196,12 +207,14 @@ int main(int argc, char **argv) {
         optind++;
     }
 
+    /* initialize flowtuple handle */
     h = flowtuple_initialize(filename);
     if (h == NULL) {
         fprintf(stderr, "failed to initialize\n");
         return 3;
     }
 
+    /* loop through records */
     while ((r = flowtuple_get_next(h)) != NULL) {
         type = flowtuple_record_get_type(r);
 
