@@ -32,8 +32,6 @@
 
 #define ASSERT(cond, action) do { if (!(cond)) { action; } } while(0)
 
-#define WANDIO_READ(i, b, s, action) do { if () } while(0)
-
 int _flowtuple_check_magic(flowtuple_handle_t *handle);
 uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len);
 

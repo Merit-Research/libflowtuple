@@ -32,7 +32,7 @@ int _flowtuple_check_magic(flowtuple_handle_t *handle) {
     CALLOC(buf, 5, sizeof(char), return -1);
 
     if ((peek = wandio_peek(handle->io, buf, 4)) == 0) {
-        ret = 0;
+        ret = -1; /* EOF */
     } else if (peek < 0) {
         handle->errno = FLOWTUPLE_ERR_FILE_READ;
         ret = -1;
@@ -66,9 +66,4 @@ uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len) {
     }
 
     return ret;
-}
-
-void _flowtuple_set_errno(flowtuple_handle_t *handle, flowtuple_errno_t errno) {
-    ASSERT(handle != NULL, return);
-    handle->errno = errno;
 }
