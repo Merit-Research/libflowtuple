@@ -94,7 +94,7 @@ typedef struct _flowtuple_slash_eight_t {
  * @param filename Filename of input
  * @return New flowtuple handle
  */
-flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *errno);
+flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *err);
 
 /** Free a flowtuple handle structure.
  * @param handle Handle to be freed

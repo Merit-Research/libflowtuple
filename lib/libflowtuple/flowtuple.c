@@ -28,8 +28,8 @@
 #include "util.h"
 #include "record.h"
 
-flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *errno) {
-    flowtuple_errno_t err = FLOWTUPLE_ERR_OK;
+flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *err) {
+    flowtuple_errno_t local_err = FLOWTUPLE_ERR_OK;
     flowtuple_handle_t *handle = NULL;
 
 
@@ -40,19 +40,19 @@ flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t
 
     handle->io = wandio_create(filename);
     if (handle->io == NULL) {
-        err = FLOWTUPLE_ERR_FILE_OPEN;
+        local_err = FLOWTUPLE_ERR_FILE_OPEN;
         goto fail;
     }
 
-    *errno = err;
-    handle->errno = err;
+    *err = local_err;
+    handle->errno = local_err;
     return handle;
 
     nomem:
-    err = FLOWTUPLE_ERR_MEM;
+    local_err = FLOWTUPLE_ERR_MEM;
 
     fail:
-    *errno = err;
+    *err = local_err;
     flowtuple_release(handle);
     return NULL;
 }
