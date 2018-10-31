@@ -62,7 +62,7 @@ typedef enum _flowtuple_errno_t {
 } flowtuple_errno_t;
 
 flowtuple_errno_t flowtuple_errno(flowtuple_handle_t *handle);
-const char *flowtuple_strerr(flowtuple_errno_t errno);
+const char *flowtuple_strerr(flowtuple_errno_t err);
 
 /*
  * Enumerations

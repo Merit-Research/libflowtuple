@@ -27,8 +27,8 @@ flowtuple_errno_t flowtuple_errno(flowtuple_handle_t *handle) {
     return handle->errno;
 }
 
-const char *flowtuple_strerr(flowtuple_errno_t errno) {
-    switch (errno) {
+const char *flowtuple_strerr(flowtuple_errno_t err) {
+    switch (err) {
         case FLOWTUPLE_ERR_MEM:
             /* out of memory */
             return "out of memory";
