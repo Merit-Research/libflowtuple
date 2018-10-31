@@ -67,14 +67,23 @@ flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record) {
 }
 
 flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
-    uint8_t *buf;
+    uint8_t *buf = NULL;
     flowtuple_header_t header;
     flowtuple_record_t *ret;
+    int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_header_t), return NULL);
-    CALLOC(buf, 26, sizeof(uint8_t), return NULL);
+    CALLOC(ret, 1, sizeof(flowtuple_header_t), goto nomem);
+    CALLOC(buf, 26, sizeof(uint8_t), goto nomem);
 
-    wandio_read(handle->io, buf, 14);
+    wand = wandio_read(handle->io, buf, 14);
+    if (wand == 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_EOF;
+        goto fail;
+    } else if (wand < 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_READ;
+        goto fail;
+    }
+
     header.version_major = (uint8_t)_flowtuple_bytes_to_int(buf + 4, 1);
     header.version_minor = (uint8_t)_flowtuple_bytes_to_int(buf + 5, 1);
     header.local_init_time = (uint32_t)_flowtuple_bytes_to_int(buf + 6, 4);
@@ -83,8 +92,8 @@ flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
     header.traceuri_len = (uint16_t)_flowtuple_bytes_to_int(buf + 12, 2);
     FREE(buf);
     if (header.traceuri_len != 0) {
-        CALLOC(buf, header.traceuri_len + 1, sizeof(uint8_t), return 0);
-        CALLOC(header.traceuri, header.traceuri_len + 1, sizeof(uint8_t), return 0);
+        CALLOC(buf, header.traceuri_len + 1, sizeof(uint8_t), goto nomem);
+        CALLOC(header.traceuri, header.traceuri_len + 1, sizeof(uint8_t), goto nomem);
         wandio_read(handle->io, buf, header.traceuri_len);
         memcpy(header.traceuri, buf, header.traceuri_len * sizeof(uint8_t));
         FREE(buf);
@@ -97,8 +106,8 @@ flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
     header.plugin_cnt = (uint16_t)_flowtuple_bytes_to_int(buf, 2);
     FREE(buf);
 
-    CALLOC(buf, (size_t)header.plugin_cnt * 4, sizeof(uint8_t), return NULL);
-    CALLOC(header.plugins, header.plugin_cnt, sizeof(uint32_t), return NULL);
+    CALLOC(buf, (size_t)header.plugin_cnt * 4, sizeof(uint8_t), goto nomem);
+    CALLOC(header.plugins, header.plugin_cnt, sizeof(uint32_t), goto nomem);
 
     wandio_read(handle->io, buf, header.plugin_cnt * 4);
     for (size_t i = 0; i < header.plugin_cnt; i++) {
@@ -111,17 +120,34 @@ flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
 
     FREE(buf);
     return ret;
+
+    nomem:
+    handle->errno = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    FREE(buf);
+    flowtuple_record_free(ret);
+    return NULL;
 }
 
 flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle) {
-    uint8_t *buf;
+    uint8_t *buf = NULL;
     flowtuple_interval_t interval;
     flowtuple_record_t *ret;
+    int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), return NULL);
-    CALLOC(buf, 10, sizeof(uint8_t), return NULL);
+    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
+    CALLOC(buf, 10, sizeof(uint8_t), goto nomem);
 
-    wandio_read(handle->io, buf, 10);
+    wand = wandio_read(handle->io, buf, 10);
+    if (wand == 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_EOF;
+        goto fail;
+    } else if (wand < 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_READ;
+        goto fail;
+    }
+
     interval.number = (uint16_t)_flowtuple_bytes_to_int(buf + 4, 2);
     interval.time = (uint32_t)_flowtuple_bytes_to_int(buf + 6, 4);
 
@@ -131,16 +157,33 @@ flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle) 
 
     FREE(buf);
     return ret;
+
+    nomem:
+    handle->errno = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    FREE(buf);
+    flowtuple_record_free(ret);
+    return NULL;
 }
 
 flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle) {
-    uint8_t *buf;
+    uint8_t *buf = NULL;
     flowtuple_trailer_t trailer;
     flowtuple_record_t *ret;
+    int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), return NULL);
-    CALLOC(buf, 44, sizeof(uint8_t), return NULL);
-    wandio_read(handle->io, buf, 44);
+    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
+    CALLOC(buf, 44, sizeof(uint8_t), goto nomem);
+
+    wand = wandio_read(handle->io, buf, 44);
+    if (wand == 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_EOF;
+        goto fail;
+    } else if (wand < 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_READ;
+        goto fail;
+    }
 
     trailer.packet_cnt = _flowtuple_bytes_to_int(buf + 4, 8);
     trailer.accepted_cnt = _flowtuple_bytes_to_int(buf + 12, 8);
@@ -156,29 +199,44 @@ flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle) {
 
     FREE(buf);
     return ret;
+
+    nomem:
+    handle->errno = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    FREE(buf);
+    flowtuple_record_free(ret);
+    return NULL;
 }
 
 flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle) {
-    uint8_t *buf;
+    uint8_t *buf = NULL;
     flowtuple_class_t ftclass;
     flowtuple_record_t *ret;
     int is_start;
+    int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), return NULL);
+    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
 
     if (handle->last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA ||
         (handle->last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS &&
          handle->last_record.record.ftclass.is_start)) {
         is_start = 0;
-        CALLOC(buf, 6, sizeof(uint8_t), return NULL);
-        wandio_read(handle->io, buf, 6);
+        CALLOC(buf, 6, sizeof(uint8_t), goto nomem);
+        wand = wandio_read(handle->io, buf, 6);
     } else {
         is_start = 1;
-        CALLOC(buf, 10, sizeof(uint8_t), return NULL);
-        wandio_read(handle->io, buf, 10);
+        CALLOC(buf, 10, sizeof(uint8_t), goto nomem);
+        wand = wandio_read(handle->io, buf, 10);
     }
 
-
+    if (wand == 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_EOF;
+        goto fail;
+    } else if (wand < 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_READ;
+        goto fail;
+    }
 
     ftclass.magic = (uint32_t)_flowtuple_bytes_to_int(buf, 4);
     ftclass.class_type = (uint16_t)_flowtuple_bytes_to_int(buf + 4, 2);
@@ -197,19 +255,27 @@ flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle) {
 
     FREE(buf);
     return ret;
+
+    nomem:
+    handle->errno = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    FREE(buf);
+    flowtuple_record_free(ret);
+    return NULL;
 }
 
 flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
     ASSERT(handle != NULL, return NULL);
 
-    uint8_t *buf;
+    uint8_t *buf = NULL;
     uint32_t magic;
     size_t offset;
     flowtuple_data_t data;
     flowtuple_record_t *ret;
     flowtuple_record_t last_record;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), return NULL);
+    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
 
     last_record = handle->last_record;
     if (last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS) {
@@ -220,24 +286,24 @@ flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
         data.number = last_record.record.data.number + 1;
     } else {
         /* this shouldn't happen */
-        flowtuple_record_free(ret);
-        return NULL;
+        handle->errno = FLOWTUPLE_ERR_CORRUPT;
+        goto fail;
     }
 
     magic = last_record.record.ftclass.magic;
 
     if (magic == 0x53495854) {
         /* SIXT */
-        CALLOC(buf, 20, sizeof(uint8_t), return NULL);
+        CALLOC(buf, 20, sizeof(uint8_t), goto nomem);
         wandio_read(handle->io, buf, 20);
     } else if (magic == 0x53495855) {
         /* SIXU */
-        CALLOC(buf, 21, sizeof(uint8_t), return NULL);
+        CALLOC(buf, 21, sizeof(uint8_t), goto nomem);
         wandio_read(handle->io, buf, 21);
     } else {
         /* something's wrong */
-        flowtuple_record_free(ret);
-        return NULL;
+        handle->errno = FLOWTUPLE_ERR_WRONG_MAGIC;
+        goto fail;
     }
 
     data.src_ip = (uint32_t)_flowtuple_bytes_to_int(buf, 4);
@@ -269,4 +335,12 @@ flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
 
     FREE(buf);
     return ret;
+
+    nomem:
+    handle->errno = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    FREE(buf);
+    flowtuple_record_free(ret);
+    return NULL;
 }

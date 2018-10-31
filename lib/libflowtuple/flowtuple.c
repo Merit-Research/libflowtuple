@@ -28,21 +28,33 @@
 #include "util.h"
 #include "record.h"
 
-flowtuple_handle_t *flowtuple_initialize(const char *filename) {
+flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *errno) {
+    flowtuple_errno_t err = FLOWTUPLE_ERR_OK;
     flowtuple_handle_t *handle = NULL;
 
-    CALLOC(handle, 1, sizeof(flowtuple_handle_t), return NULL);
 
-    CALLOC(handle->uri, strlen(filename) + 1, sizeof(char), return NULL);
+    CALLOC(handle, 1, sizeof(flowtuple_handle_t), goto nomem);
+
+    CALLOC(handle->uri, strlen(filename) + 1, sizeof(char), goto nomem);
     strcpy(handle->uri, filename);
 
     handle->io = wandio_create(filename);
     if (handle->io == NULL) {
-        flowtuple_release(handle);
-        return NULL;
+        err = FLOWTUPLE_ERR_FILE_OPEN;
+        goto fail;
     }
 
+    *errno = err;
+    handle->errno = err;
     return handle;
+
+    nomem:
+    err = FLOWTUPLE_ERR_MEM;
+
+    fail:
+    *errno = err;
+    flowtuple_release(handle);
+    return NULL;
 }
 
 void flowtuple_release(flowtuple_handle_t *handle) {
@@ -71,7 +83,10 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
     type = _flowtuple_check_magic(handle);
     switch (type) {
         case 1:
-            wandio_read(handle->io, buf, 4);
+            if (wandio_read(handle->io, buf, 4) < 0) {
+                handle->errno = FLOWTUPLE_ERR_FILE_READ;
+                return NULL;
+            }
             goto check;
         case 2:
             return _flowtuple_record_read_interval(handle);
@@ -86,7 +101,7 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
         case 0:
             return _flowtuple_record_read_data(handle);
         default:
-            break;
+            return NULL;
     }
 }
 

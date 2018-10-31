@@ -28,10 +28,14 @@
 int _flowtuple_check_magic(flowtuple_handle_t *handle) {
     char *buf;
     int ret;
+    int64_t peek;
     CALLOC(buf, 5, sizeof(char), return -1);
 
-    if (wandio_peek(handle->io, buf, 4) <= 0) {
+    if ((peek = wandio_peek(handle->io, buf, 4)) == 0) {
         ret = 0;
+    } else if (peek < 0) {
+        handle->errno = FLOWTUPLE_ERR_FILE_READ;
+        ret = -1;
     } else if (strcmp(buf, "EDGR") == 0) {
         ret = 1;
     } else if (strcmp(buf, "INTR") == 0) {
@@ -62,4 +66,9 @@ uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len) {
     }
 
     return ret;
+}
+
+void _flowtuple_set_errno(flowtuple_handle_t *handle, flowtuple_errno_t errno) {
+    ASSERT(handle != NULL, return);
+    handle->errno = errno;
 }

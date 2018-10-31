@@ -97,6 +97,7 @@ struct _flowtuple_handle_t {
     char *uri;
     io_t *io;
     flowtuple_record_t last_record;
+    flowtuple_errno_t errno;
 };
 
 #endif

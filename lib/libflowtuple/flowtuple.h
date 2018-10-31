@@ -50,6 +50,20 @@ typedef struct _flowtuple_data_t flowtuple_data_t;
 /** Flowtuple record object */
 typedef struct _flowtuple_record_t flowtuple_record_t;
 
+typedef enum _flowtuple_errno_t {
+    FLOWTUPLE_ERR_OK = 0,
+    FLOWTUPLE_ERR_MEM,
+    FLOWTUPLE_ERR_WRONG_MAGIC,
+    FLOWTUPLE_ERR_CORRUPT,
+    /* file */
+    FLOWTUPLE_ERR_FILE_OPEN,
+    FLOWTUPLE_ERR_FILE_READ,
+    FLOWTUPLE_ERR_FILE_EOF,
+} flowtuple_errno_t;
+
+flowtuple_errno_t flowtuple_errno(flowtuple_handle_t *handle);
+const char *flowtuple_strerr(flowtuple_errno_t errno);
+
 /*
  * Enumerations
  */
@@ -80,7 +94,7 @@ typedef struct _flowtuple_slash_eight_t {
  * @param filename Filename of input
  * @return New flowtuple handle
  */
-flowtuple_handle_t *flowtuple_initialize(const char *filename);
+flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t *errno);
 
 /** Free a flowtuple handle structure.
  * @param handle Handle to be freed

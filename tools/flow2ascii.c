@@ -146,6 +146,7 @@ int main(int argc, char **argv) {
     flowtuple_handle_t *h;        /* handle */
     flowtuple_record_t *r;        /* current record */
     flowtuple_record_type_t type; /* record type */
+    flowtuple_errno_t errno;      /* errors */
     void *data;                   /* record data */
     char *filename = NULL;        /* file name */
     int inter_start = 1;          /* interval start or end? */
@@ -208,9 +209,9 @@ int main(int argc, char **argv) {
     }
 
     /* initialize flowtuple handle */
-    h = flowtuple_initialize(filename);
-    if (h == NULL) {
-        fprintf(stderr, "failed to initialize\n");
+    h = flowtuple_initialize(filename, &errno);
+    if (errno != FLOWTUPLE_ERR_OK) {
+        fprintf(stderr, "ERROR: %s\n", flowtuple_strerr(errno));
         return 3;
     }
 
@@ -250,6 +251,11 @@ int main(int argc, char **argv) {
         }
 
         flowtuple_record_free(r);
+    }
+
+    errno = flowtuple_errno(h);
+    if (errno != FLOWTUPLE_ERR_OK) {
+        fprintf(stderr, "ERROR: %s\n", flowtuple_strerr(errno));
     }
 
     fail:

@@ -53,7 +53,8 @@ add_library(flowtuple SHARED
         lib/libflowtuple/data.c
         lib/libflowtuple/header.c
         lib/libflowtuple/interval.c
-        lib/libflowtuple/trailer.c)
+        lib/libflowtuple/trailer.c
+        lib/libflowtuple/error.c)
 
 add_executable(flow2ascii tools/flow2ascii.c)
 target_link_libraries(flow2ascii flowtuple)
