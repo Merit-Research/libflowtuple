@@ -78,6 +78,19 @@ typedef enum _flowtuple_record_type_t {
     FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA,
 } flowtuple_record_type_t;
 
+/** Flowtuple magics */
+typedef enum _flowtuple_magic_t {
+    FLOWTUPLE_MAGIC_SIXT = 0x53495854,
+    FLOWTUPLE_MAGIC_SIXU = 0x53495855,
+} flowtuple_magic_t;
+
+/** Flowtuple class types */
+typedef enum _flowtuple_class_type_t {
+    FLOWTUPLE_CLASS_TYPE_BACKSCATTER,
+    FLOWTUPLE_CLASS_TYPE_ICMPREQ,
+    FLOWTUPLE_CLASS_TYPE_OTHER,
+} flowtuple_class_type_t;
+
 /*
  * Structures
  */
@@ -205,9 +218,9 @@ uint32_t flowtuple_interval_get_time(flowtuple_interval_t *interval);
  */
 
 /** Get magic from class object */
-uint32_t flowtuple_class_get_magic(flowtuple_class_t *ftclass);
+flowtuple_magic_t flowtuple_class_get_magic(flowtuple_class_t *ftclass);
 /** Get class type from class object */
-uint16_t flowtuple_class_get_class_type(flowtuple_class_t *ftclass);
+flowtuple_class_type_t flowtuple_class_get_class_type(flowtuple_class_t *ftclass);
 /** Get key count from class object */
 uint32_t flowtuple_class_get_key_count(flowtuple_class_t *ftclass);
 

@@ -59,7 +59,7 @@ void header_print(flowtuple_header_t *header) {
     plugins = flowtuple_header_get_plugins(header);
     for (int i = 0; i < plugin_count; i++) {
         /* really, there's only one expected plugin */
-        if (plugins[i] == 0x53495854 || plugins[i] == 0x53495855) {
+        if (plugins[i] == FLOWTUPLE_MAGIC_SIXT || plugins[i] == FLOWTUPLE_MAGIC_SIXU) {
             printf("# CORSARO_PLUGIN flowtuple\n");
         }
     }

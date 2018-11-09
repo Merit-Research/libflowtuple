@@ -21,12 +21,12 @@
 #include "fttypes.h"
 #include "util.h"
 
-uint32_t flowtuple_class_get_magic(flowtuple_class_t *ftclass) {
+flowtuple_magic_t flowtuple_class_get_magic(flowtuple_class_t *ftclass) {
     ASSERT(ftclass != NULL, return 0);
     return ftclass->magic;
 }
 
-uint16_t flowtuple_class_get_class_type(flowtuple_class_t *ftclass) {
+flowtuple_class_type_t flowtuple_class_get_class_type(flowtuple_class_t *ftclass) {
     ASSERT(ftclass != NULL, return 0);
     return ftclass->class_type;
 }
