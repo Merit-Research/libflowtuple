@@ -6,7 +6,7 @@ libflowtuple is a library to read CAIDA's corsaro flowtuple format.
 Installation
 ============
 
-To install, you will need to install cmake and run the following:
+To install, you will need to install cmake and libwandio and run the following:
 
     $ mkdir build
     $ cd build
