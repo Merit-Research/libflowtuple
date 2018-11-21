@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project(libflowtuple C)
 
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_FLAGS -lwandio)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-files/cmake")
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -55,6 +54,7 @@ add_library(flowtuple SHARED
         lib/libflowtuple/interval.c
         lib/libflowtuple/trailer.c
         lib/libflowtuple/error.c)
+target_link_libraries(flowtuple wandio)
 
 add_executable(flow2ascii tools/flow2ascii.c)
 target_link_libraries(flow2ascii flowtuple)
