@@ -66,13 +66,11 @@ flowtuple_data_t *flowtuple_record_get_data(flowtuple_record_t *record) {
     return &(record->record.data);
 }
 
-flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
+void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_t *record) {
     uint8_t *buf = NULL;
     flowtuple_header_t header;
-    flowtuple_record_t *ret;
     int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_header_t), goto nomem);
     CALLOC(buf, 26, sizeof(uint8_t), goto nomem);
 
     wand = wandio_read(handle->io, buf, 14);
@@ -101,7 +99,7 @@ flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
         header.traceuri = NULL;
     }
 
-    CALLOC(buf, 2, sizeof(uint8_t), return NULL);
+    CALLOC(buf, 2, sizeof(uint8_t), return);
     wandio_read(handle->io, buf, 2);
     header.plugin_cnt = (uint16_t)_flowtuple_bytes_to_int(buf, 2);
     FREE(buf);
@@ -114,29 +112,25 @@ flowtuple_record_t *_flowtuple_record_read_header(flowtuple_handle_t *handle) {
         header.plugins[i] = (uint32_t)_flowtuple_bytes_to_int(buf + (4 * i), 4);
     }
 
-    ret->type = FLOWTUPLE_RECORD_TYPE_HEADER;
-    ret->record.header = header;
-    handle->last_record = *ret;
+    record->type = FLOWTUPLE_RECORD_TYPE_HEADER;
+    record->record.header = header;
+    handle->last_record = *record;
 
     FREE(buf);
-    return ret;
+    return;
 
     nomem:
     handle->errno = FLOWTUPLE_ERR_MEM;
 
     fail:
     FREE(buf);
-    flowtuple_record_free(ret);
-    return NULL;
 }
 
-flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle) {
+void _flowtuple_record_read_interval(flowtuple_handle_t *handle, flowtuple_record_t *record) {
     uint8_t *buf = NULL;
     flowtuple_interval_t interval;
-    flowtuple_record_t *ret;
     int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
     CALLOC(buf, 10, sizeof(uint8_t), goto nomem);
 
     wand = wandio_read(handle->io, buf, 10);
@@ -151,29 +145,25 @@ flowtuple_record_t *_flowtuple_record_read_interval(flowtuple_handle_t *handle) 
     interval.number = (uint16_t)_flowtuple_bytes_to_int(buf + 4, 2);
     interval.time = (uint32_t)_flowtuple_bytes_to_int(buf + 6, 4);
 
-    ret->type = FLOWTUPLE_RECORD_TYPE_INTERVAL;
-    ret->record.interval = interval;
-    handle->last_record = *ret;
+    record->type = FLOWTUPLE_RECORD_TYPE_INTERVAL;
+    record->record.interval = interval;
+    handle->last_record = *record;
 
     FREE(buf);
-    return ret;
+    return;
 
     nomem:
     handle->errno = FLOWTUPLE_ERR_MEM;
 
     fail:
     FREE(buf);
-    flowtuple_record_free(ret);
-    return NULL;
 }
 
-flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle) {
+void _flowtuple_record_read_trailer(flowtuple_handle_t *handle, flowtuple_record_t *record) {
     uint8_t *buf = NULL;
     flowtuple_trailer_t trailer;
-    flowtuple_record_t *ret;
     int64_t wand;
 
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
     CALLOC(buf, 44, sizeof(uint8_t), goto nomem);
 
     wand = wandio_read(handle->io, buf, 44);
@@ -193,30 +183,25 @@ flowtuple_record_t *_flowtuple_record_read_trailer(flowtuple_handle_t *handle) {
     trailer.local_final_time = (uint32_t)_flowtuple_bytes_to_int(buf + 36, 4);
     trailer.runtime = (uint32_t)_flowtuple_bytes_to_int(buf + 40, 4);
 
-    ret->type = FLOWTUPLE_RECORD_TYPE_TRAILER;
-    ret->record.trailer = trailer;
-    handle->last_record = *ret;
+    record->type = FLOWTUPLE_RECORD_TYPE_TRAILER;
+    record->record.trailer = trailer;
+    handle->last_record = *record;
 
     FREE(buf);
-    return ret;
+    return;
 
     nomem:
     handle->errno = FLOWTUPLE_ERR_MEM;
 
     fail:
     FREE(buf);
-    flowtuple_record_free(ret);
-    return NULL;
 }
 
-flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle) {
+void _flowtuple_record_read_class(flowtuple_handle_t *handle, flowtuple_record_t *record) {
     uint8_t *buf = NULL;
     flowtuple_class_t ftclass;
-    flowtuple_record_t *ret;
     int is_start;
     int64_t wand;
-
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
 
     if (handle->last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA ||
         (handle->last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS &&
@@ -249,33 +234,26 @@ flowtuple_record_t *_flowtuple_record_read_class(flowtuple_handle_t *handle) {
 
     ftclass.is_start = is_start;
 
-    ret->type = FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS;
-    ret->record.ftclass = ftclass;
-    handle->last_record = *ret;
+    record->type = FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS;
+    record->record.ftclass = ftclass;
+    handle->last_record = *record;
 
     FREE(buf);
-    return ret;
+    return;
 
     nomem:
     handle->errno = FLOWTUPLE_ERR_MEM;
 
     fail:
     FREE(buf);
-    flowtuple_record_free(ret);
-    return NULL;
 }
 
-flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return NULL);
-
+void _flowtuple_record_read_data(flowtuple_handle_t *handle, flowtuple_record_t *record) {
     uint8_t *buf = NULL;
     uint32_t magic;
     size_t offset;
     flowtuple_data_t data;
-    flowtuple_record_t *ret;
     flowtuple_record_t last_record;
-
-    CALLOC(ret, 1, sizeof(flowtuple_record_t), goto nomem);
 
     last_record = handle->last_record;
     if (last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS) {
@@ -329,18 +307,16 @@ flowtuple_record_t *_flowtuple_record_read_data(flowtuple_handle_t *handle) {
     data.ip_len = (uint16_t)_flowtuple_bytes_to_int(buf + offset + 7, 2);
     data.pkt_cnt = (uint32_t)_flowtuple_bytes_to_int(buf + offset + 9, 4);
 
-    ret->type = FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA;
-    ret->record.data = data;
-    handle->last_record = *ret;
+    record->type = FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA;
+    record->record.data = data;
+    handle->last_record = *record;
 
     FREE(buf);
-    return ret;
+    return;
 
     nomem:
     handle->errno = FLOWTUPLE_ERR_MEM;
 
     fail:
     FREE(buf);
-    flowtuple_record_free(ret);
-    return NULL;
 }

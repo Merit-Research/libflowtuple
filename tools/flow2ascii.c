@@ -244,10 +244,7 @@ int main(int argc, char **argv) {
                 break;
             case FLOWTUPLE_RECORD_TYPE_NULL:
             default:
-                /* bail out */
-                fprintf(stderr, "ERROR: failure parsing file\n");
-                flowtuple_record_free(r);
-                goto fail;
+                break;
         }
 
         flowtuple_record_free(r);
@@ -258,7 +255,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "ERROR: %s\n", flowtuple_strerr(errno));
     }
 
-    fail:
     flowtuple_release(h);
     return 0;
 }

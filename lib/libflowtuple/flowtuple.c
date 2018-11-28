@@ -73,11 +73,13 @@ void flowtuple_release(flowtuple_handle_t *handle) {
     FREE(handle);
 }
 
-flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return NULL);
-
+static int _flowtuple_get_next(flowtuple_handle_t *handle, flowtuple_record_t **record) {
     int type;
     uint8_t buf[5];
+
+    if (*record == NULL) {
+        CALLOC(*record, 1, sizeof(flowtuple_record_t), return -1);
+    }
 
     check:
     type = _flowtuple_check_magic(handle);
@@ -85,24 +87,66 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
         case 1:
             if (wandio_read(handle->io, buf, 4) < 0) {
                 handle->errno = FLOWTUPLE_ERR_FILE_READ;
-                return NULL;
+                *record = NULL;
             }
             goto check;
         case 2:
-            return _flowtuple_record_read_interval(handle);
+            _flowtuple_record_read_interval(handle, *record);
+            break;
         case 3:
-            return _flowtuple_record_read_header(handle);
+            _flowtuple_record_read_header(handle, *record);
+            break;
         case 4:
-            return _flowtuple_record_read_trailer(handle);
+            _flowtuple_record_read_trailer(handle, *record);
+            break;
         case 5:
         case 6:
-            return _flowtuple_record_read_class(handle);
+            _flowtuple_record_read_class(handle, *record);
+            break;
         case 7:
         case 0:
-            return _flowtuple_record_read_data(handle);
+            _flowtuple_record_read_data(handle, *record);
+            break;
         default:
-            return NULL;
+            *record = NULL;
+            break;
     }
+
+    if (handle->errno != FLOWTUPLE_ERR_OK) {
+        return -1;
+    }
+    return 0;
+}
+
+flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
+    ASSERT(handle != NULL, return NULL);
+    flowtuple_record_t *record = NULL;
+    int result = _flowtuple_get_next(handle, &record);
+
+    if (result < 0) {
+        return NULL;
+    }
+    return record;
+}
+
+long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler callback, const void *args) {
+    flowtuple_record_t *record_ptr = NULL;
+    long ret = 0;
+    int res;
+
+    while (cnt < 0 || ret < cnt) {
+        res = _flowtuple_get_next(handle, &record_ptr);
+
+        if (res < 0) {
+            break;
+        }
+
+        callback(record_ptr, args);
+        ret++;
+    }
+
+    flowtuple_record_free(record_ptr);
+    return ret;
 }
 
 const char *flowtuple_handle_get_uri(flowtuple_handle_t *handle) {
