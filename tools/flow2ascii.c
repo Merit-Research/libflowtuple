@@ -181,7 +181,6 @@ int main(int argc, char **argv) {
     flowtuple_record_t *r;        /* current record */
     flowtuple_record_type_t type; /* record type */
     flowtuple_errno_t errno;      /* errors */
-    void *data;                   /* record data */
     char *filename = NULL;        /* file name */
     int trackers[] = { 1, 1, 0 }; /* is interval start, is class start, first octet */
     int c;                        /* getopt option */
