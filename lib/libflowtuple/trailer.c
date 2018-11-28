@@ -22,36 +22,36 @@
 #include "util.h"
 
 uint64_t flowtuple_trailer_get_packet_count(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->packet_cnt;
 }
 
 uint64_t flowtuple_trailer_get_accepted_count(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->accepted_cnt;
 }
 
 uint64_t flowtuple_trailer_get_dropped_count(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->dropped_cnt;
 }
 
 uint32_t flowtuple_trailer_get_first_packet_time(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->first_packet_time;
 }
 
 uint32_t flowtuple_trailer_get_last_packet_time(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->last_packet_time;
 }
 
 uint32_t flowtuple_trailer_get_local_final_time(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->local_final_time;
 }
 
 uint32_t flowtuple_trailer_get_runtime(flowtuple_trailer_t *trailer) {
-    ASSERT(trailer != NULL, return 0);
+    CHECK(trailer != NULL, return 0);
     return trailer->runtime;
 }

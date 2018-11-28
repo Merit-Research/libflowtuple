@@ -23,7 +23,7 @@
 #include "util.h"
 
 flowtuple_errno_t flowtuple_errno(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return FLOWTUPLE_ERR_OK);
+    CHECK(handle != NULL, return FLOWTUPLE_ERR_OK);
     return handle->errno;
 }
 

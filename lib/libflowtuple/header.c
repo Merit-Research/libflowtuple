@@ -22,41 +22,41 @@
 #include "util.h"
 
 uint8_t flowtuple_header_get_version_major(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->version_major;
 }
 
 uint8_t flowtuple_header_get_version_minor(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->version_minor;
 }
 
 uint32_t flowtuple_header_get_local_init_time(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->local_init_time;
 }
 
 uint16_t flowtuple_header_get_interval_length(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->interval_length;
 }
 
 uint16_t flowtuple_header_get_traceuri_len(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->traceuri_len;
 }
 
 const char *flowtuple_header_get_traceuri(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return NULL);
+    CHECK(header != NULL, return NULL);
     return (const char *)(header->traceuri);
 }
 
 uint16_t flowtuple_header_get_plugin_count(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return 0);
+    CHECK(header != NULL, return 0);
     return header->plugin_cnt;
 }
 
 uint32_t *flowtuple_header_get_plugins(flowtuple_header_t *header) {
-    ASSERT(header != NULL, return NULL);
+    CHECK(header != NULL, return NULL);
     return header->plugins;
 }

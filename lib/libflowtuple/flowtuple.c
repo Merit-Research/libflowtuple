@@ -120,7 +120,7 @@ static int _flowtuple_get_next(flowtuple_handle_t *handle, flowtuple_record_t **
 }
 
 flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return NULL);
+    CHECK(handle != NULL, return NULL);
     flowtuple_record_t *record = NULL;
     int result = _flowtuple_get_next(handle, &record);
 
@@ -151,12 +151,12 @@ long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler call
 }
 
 const char *flowtuple_handle_get_uri(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return NULL);
+    CHECK(handle != NULL, return NULL);
     return handle->uri;
 }
 
 flowtuple_record_t *flowtuple_handle_get_last_record(flowtuple_handle_t *handle) {
-    ASSERT(handle != NULL, return NULL);
+    CHECK(handle != NULL, return NULL);
     flowtuple_record_t *ret;
     MALLOC(ret, sizeof(flowtuple_record_t), return NULL);
     memcpy(ret, &(handle->last_record), sizeof(flowtuple_record_t));

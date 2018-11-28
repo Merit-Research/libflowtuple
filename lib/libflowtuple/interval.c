@@ -22,11 +22,11 @@
 #include "util.h"
 
 uint16_t flowtuple_interval_get_number(flowtuple_interval_t *interval) {
-    ASSERT(interval != NULL, return 0);
+    CHECK(interval != NULL, return 0);
     return interval->number;
 }
 
 uint32_t flowtuple_interval_get_time(flowtuple_interval_t *interval) {
-    ASSERT(interval != NULL, return 0);
+    CHECK(interval != NULL, return 0);
     return interval->time;
 }
