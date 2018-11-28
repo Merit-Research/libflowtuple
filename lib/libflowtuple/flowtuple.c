@@ -108,6 +108,7 @@ static int _flowtuple_get_next(flowtuple_handle_t *handle, flowtuple_record_t **
             _flowtuple_record_read_data(handle, *record);
             break;
         default:
+            flowtuple_record_free(*record);
             *record = NULL;
             break;
     }
