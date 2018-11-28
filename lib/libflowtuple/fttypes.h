@@ -27,6 +27,13 @@
 
 #include "flowtuple.h"
 
+/* Slash eight structure. */
+typedef struct _flowtuple_slash_eight_t {
+    uint8_t b;
+    uint8_t c;
+    uint8_t d;
+} flowtuple_slash_eight_t;
+
 struct _flowtuple_header_t {
     uint8_t version_major;
     uint8_t version_minor;

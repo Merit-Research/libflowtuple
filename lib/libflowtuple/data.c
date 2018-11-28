@@ -36,20 +36,14 @@ uint32_t flowtuple_data_get_src_ip(flowtuple_data_t *data) {
     return data->src_ip;
 }
 
-uint32_t flowtuple_data_get_dest_ip_int(flowtuple_data_t *data) {
+uint32_t flowtuple_data_get_dest_ip(flowtuple_data_t *data) {
     CHECK(data != NULL, return 0);
-    return data->dst_ip.x;
-}
 
-flowtuple_slash_eight_t flowtuple_data_get_dest_ip_slash_eight(flowtuple_data_t *data) {
-    if (data == NULL) {
-        flowtuple_slash_eight_t ret;
-        ret.b = 0;
-        ret.c = 0;
-        ret.d = 0;
-        return ret;
+    if (data->has_slash_eight) {
+        return (data->dst_ip.y.b << 16) | (data->dst_ip.y.c) << 8 | data->dst_ip.y.d;
+    } else {
+        return data->dst_ip.x;
     }
-    return data->dst_ip.y;
 }
 
 uint16_t flowtuple_data_get_src_port(flowtuple_data_t *data) {

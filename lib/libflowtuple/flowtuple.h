@@ -95,14 +95,6 @@ typedef enum _flowtuple_class_type_t {
  * Structures
  */
 
-/** Slash eight structure. */
-typedef struct _flowtuple_slash_eight_t {
-    uint8_t b;
-    uint8_t c;
-    uint8_t d;
-} flowtuple_slash_eight_t;
-
-
 /** Initialize flowtuple file for reading.
  * @param filename Filename of input
  * @return New flowtuple handle
@@ -240,10 +232,8 @@ flowtuple_class_t *flowtuple_data_get_class_start(flowtuple_data_t *data);
 uint32_t flowtuple_data_get_number(flowtuple_data_t *data);
 /** Get source ip from data object */
 uint32_t flowtuple_data_get_src_ip(flowtuple_data_t *data);
-/** Get destination ip (integer) from data object */
-uint32_t flowtuple_data_get_dest_ip_int(flowtuple_data_t *data);
-/** Get destination ip (slash eight) from data object */
-flowtuple_slash_eight_t flowtuple_data_get_dest_ip_slash_eight(flowtuple_data_t *data);
+/** Get destination ip from data object */
+uint32_t flowtuple_data_get_dest_ip(flowtuple_data_t *data);
 /** Get source port from data object */
 uint16_t flowtuple_data_get_src_port(flowtuple_data_t *data);
 /** Get destination port from data object */

@@ -111,16 +111,10 @@ void class_print(flowtuple_class_t *ftclass, int is_start) {
 void data_print(flowtuple_data_t *data, uint8_t first_octet) {
     uint8_t src_ip[4];
     uint8_t dst_ip[4];
-    flowtuple_slash_eight_t se;
 
+    ntoa(flowtuple_data_get_dest_ip(data), dst_ip);
     if (flowtuple_data_is_slash_eight(data)) {
-        se = flowtuple_data_get_dest_ip_slash_eight(data);
         dst_ip[0] = first_octet;
-        dst_ip[1] = se.b;
-        dst_ip[2] = se.c;
-        dst_ip[3] = se.d;
-    } else {
-        ntoa(flowtuple_data_get_dest_ip_int(data), dst_ip);
     }
 
     ntoa(flowtuple_data_get_src_ip(data), src_ip);
