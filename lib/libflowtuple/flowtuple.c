@@ -129,7 +129,7 @@ flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle) {
     return record;
 }
 
-long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler callback, const void *args) {
+long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler callback, void *args) {
     flowtuple_record_t *record_ptr = NULL;
     long ret = 0;
     int res;
@@ -137,7 +137,7 @@ long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler call
     while (cnt < 0 || ret < cnt) {
         res = _flowtuple_get_next(handle, &record_ptr);
 
-        if (res < 0) {
+        if (res < 0 || record_ptr == NULL) {
             break;
         }
 

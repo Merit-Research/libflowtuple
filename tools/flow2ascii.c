@@ -137,6 +137,40 @@ void data_print(flowtuple_data_t *data, uint8_t first_octet) {
            flowtuple_data_get_packet_count(data));
 }
 
+void process_record(flowtuple_record_t *record, void *args) {
+    int *iargs = (int*)args;
+    flowtuple_record_type_t type = flowtuple_record_get_type(record);
+    void *data;
+
+    switch (type) {
+        case FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS:
+            data = (void*)flowtuple_record_get_class(record);
+            class_print((flowtuple_class_t*)data, iargs[1]);
+            iargs[1] = !iargs[1];
+            break;
+        case FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA:
+            data = (void*)flowtuple_record_get_data(record);
+            data_print((flowtuple_data_t*)data, (uint8_t)iargs[2]);
+            break;
+        case FLOWTUPLE_RECORD_TYPE_HEADER:
+            data = (void*)flowtuple_record_get_header(record);
+            header_print((flowtuple_header_t*)data);
+            break;
+        case FLOWTUPLE_RECORD_TYPE_TRAILER:
+            data = (void*)flowtuple_record_get_trailer(record);
+            trailer_print((flowtuple_trailer_t*)data);
+            break;
+        case FLOWTUPLE_RECORD_TYPE_INTERVAL:
+            data = (void*)flowtuple_record_get_interval(record);
+            interval_print((flowtuple_interval_t*)data, iargs[0]);
+            iargs[0] = !iargs[0];
+            break;
+        case FLOWTUPLE_RECORD_TYPE_NULL:
+        default:
+            break;
+    }
+}
+
 /* print usage */
 void usage(const char *program_name) {
     printf("Usage: %s [-o octet] inputfile\n", program_name);
@@ -149,9 +183,7 @@ int main(int argc, char **argv) {
     flowtuple_errno_t errno;      /* errors */
     void *data;                   /* record data */
     char *filename = NULL;        /* file name */
-    int inter_start = 1;          /* interval start or end? */
-    int class_start = 1;          /* class start or end? */
-    int first_octet = 0;          /* first octet for slash eight */
+    int trackers[] = { 1, 1, 0 }; /* is interval start, is class start, first octet */
     int c;                        /* getopt option */
     char *tmp;                    /* getopt tmp string */
 
@@ -170,20 +202,20 @@ int main(int argc, char **argv) {
             case 'o':
                 /* octet */
                 if (optarg != NULL) {
-                    first_octet = (int)strtol(optarg, &tmp, 10);
+                    trackers[2] = (int)strtol(optarg, &tmp, 10);
                 } else {
                     fprintf(stderr, "option --octet requires an integer option\n");
                     usage(argv[0]);
                     return 1;
                 }
 
-                if (first_octet == 0 && strcmp(tmp, "") != 0) {
+                if (trackers[2] == 0 && strcmp(tmp, "") != 0) {
                     fprintf(stderr, "option -o requires an integer option\n");
                     usage(argv[0]);
                     return 1;
                 }
 
-                if (first_octet < 0 || first_octet > 255) {
+                if (trackers[2] < 0 || trackers[2] > 255) {
                     fprintf(stderr, "ERROR: octet must be between 0 and 255\n");
                     return 2;
                 }
@@ -216,39 +248,7 @@ int main(int argc, char **argv) {
     }
 
     /* loop through records */
-    while ((r = flowtuple_get_next(h)) != NULL) {
-        type = flowtuple_record_get_type(r);
-
-        switch (type) {
-            case FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_CLASS:
-                data = (void*)flowtuple_record_get_class(r);
-                class_print((flowtuple_class_t*)data, class_start);
-                class_start = !class_start;
-                break;
-            case FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA:
-                data = (void*)flowtuple_record_get_data(r);
-                data_print((flowtuple_data_t*)data, (uint8_t)first_octet);
-                break;
-            case FLOWTUPLE_RECORD_TYPE_HEADER:
-                data = (void*)flowtuple_record_get_header(r);
-                header_print((flowtuple_header_t*)data);
-                break;
-            case FLOWTUPLE_RECORD_TYPE_TRAILER:
-                data = (void*)flowtuple_record_get_trailer(r);
-                trailer_print((flowtuple_trailer_t*)data);
-                break;
-            case FLOWTUPLE_RECORD_TYPE_INTERVAL:
-                data = (void*)flowtuple_record_get_interval(r);
-                interval_print((flowtuple_interval_t*)data, inter_start);
-                inter_start = !inter_start;
-                break;
-            case FLOWTUPLE_RECORD_TYPE_NULL:
-            default:
-                break;
-        }
-
-        flowtuple_record_free(r);
-    }
+    flowtuple_loop(h, -1, process_record, (void*)trackers);
 
     errno = flowtuple_errno(h);
     if (errno != FLOWTUPLE_ERR_OK) {

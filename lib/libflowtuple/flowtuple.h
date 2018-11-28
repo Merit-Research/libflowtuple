@@ -64,8 +64,6 @@ typedef enum _flowtuple_errno_t {
 flowtuple_errno_t flowtuple_errno(flowtuple_handle_t *handle);
 const char *flowtuple_strerr(flowtuple_errno_t err);
 
-typedef void (*flowtuple_handler)(flowtuple_record_t *, const void *);
-
 /*
  * Enumerations
  */
@@ -117,7 +115,9 @@ flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t
 void flowtuple_release(flowtuple_handle_t *handle);
 
 flowtuple_record_t *flowtuple_get_next(flowtuple_handle_t *handle);
-long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler callback, const void *args);
+
+typedef void (*flowtuple_handler)(flowtuple_record_t *, void *);
+long flowtuple_loop(flowtuple_handle_t *handle, long cnt, flowtuple_handler callback, void *args);
 
 /** @addtogroup flowtuple_api_handle Options
  * Libflowtuple handle getters
