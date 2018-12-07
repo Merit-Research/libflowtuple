@@ -172,8 +172,6 @@ void usage(const char *program_name) {
 
 int main(int argc, char **argv) {
     flowtuple_handle_t *h;        /* handle */
-    flowtuple_record_t *r;        /* current record */
-    flowtuple_record_type_t type; /* record type */
     flowtuple_errno_t errno;      /* errors */
     char *filename = NULL;        /* file name */
     int trackers[] = { 1, 1, 0 }; /* is interval start, is class start, first octet */
