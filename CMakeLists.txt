@@ -59,7 +59,10 @@ target_link_libraries(flowtuple wandio)
 add_executable(flow2ascii tools/flow2ascii.c)
 target_link_libraries(flow2ascii flowtuple)
 
+add_executable(flowproto tools/flowproto.c)
+target_link_libraries(flowproto flowtuple)
+
 install(FILES lib/libflowtuple/flowtuple.h DESTINATION include)
-install(TARGETS flowtuple flow2ascii
+install(TARGETS flowtuple flow2ascii flowproto
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
