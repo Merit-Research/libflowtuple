@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
     /* we expect arguments, always */
     if (argc < 2) {
         usage(argv[0]);
-        return 1;
+        return -1;
     }
 
     while ((c = getopt_long(argc, argv, ":ho:", long_opts, NULL)) != -1) {
@@ -197,28 +197,28 @@ int main(int argc, char **argv) {
                 } else {
                     fprintf(stderr, "option --octet requires an integer option\n");
                     usage(argv[0]);
-                    return 1;
+                    return -1;
                 }
 
                 if (trackers[2] == 0 && strcmp(tmp, "") != 0) {
                     fprintf(stderr, "option -o requires an integer option\n");
                     usage(argv[0]);
-                    return 1;
+                    return -1;
                 }
 
                 if (trackers[2] < 0 || trackers[2] > 255) {
                     fprintf(stderr, "ERROR: octet must be between 0 and 255\n");
-                    return 2;
+                    return -1;
                 }
                 break;
             case '?':
                 if (optopt == 'o') {
                     usage(argv[0]);
-                    return 1;
+                    return -1;
                 }
             default:
                 usage(argv[0]);
-                return 1;
+                return -1;
         }
     }
 
@@ -233,19 +233,15 @@ int main(int argc, char **argv) {
 
     /* initialize flowtuple handle */
     h = flowtuple_initialize(filename, &errno);
-    if (errno != FLOWTUPLE_ERR_OK) {
-        fprintf(stderr, "ERROR: %s\n", flowtuple_strerr(errno));
-        return 3;
-    }
 
     /* loop through records */
     flowtuple_loop(h, -1, process_record, (void*)trackers);
 
-    errno = flowtuple_errno(h);
+    errno = errno == FLOWTUPLE_ERR_OK ? flowtuple_errno(h) : errno;
     if (errno != FLOWTUPLE_ERR_OK) {
         fprintf(stderr, "ERROR: %s\n", flowtuple_strerr(errno));
     }
 
     flowtuple_release(h);
-    return 0;
+    return errno;
 }

@@ -52,14 +52,14 @@ int main(int argc, char *argv[]) {
 
     if (argc != 2) {
         fprintf(stderr, "usage: %s filename\n", argv[0]);
-        exit(1);
+        exit(-1);
     }
 
     handle = flowtuple_initialize(argv[1], &err);
 
     flowtuple_loop(handle, -1, process_record, (void*)counts);
 
-    err = flowtuple_errno(handle);
+    err = err == FLOWTUPLE_ERR_OK ? flowtuple_errno(handle) : err;
     if (err != FLOWTUPLE_ERR_OK) {
         fprintf(stderr, "error: %s\n", flowtuple_strerr(err));
         exit(err);
