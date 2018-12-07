@@ -37,7 +37,7 @@ const char *flowtuple_strerr(flowtuple_errno_t err) {
             return "incorrect magic encountered";
         case FLOWTUPLE_ERR_CORRUPT:
             /* file appears to be corrupt */
-            return "corrupt file";
+            return "corrupt or invalid file";
         case FLOWTUPLE_ERR_FILE_OPEN:
             /* wandio could not open file */
             return "could not open file";
