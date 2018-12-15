@@ -101,6 +101,15 @@ static int _flowtuple_get_next(flowtuple_handle_t *handle, flowtuple_record_t **
             break;
         case 5:
         case 6:
+            if (handle->last_record.type == FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA &&
+                handle->last_record.record.data.number < handle->last_record.record.data.class_start.key_count) {
+                /* fixes issue #2
+                 * makes sure that we read a data record if a class
+                 * is unexpected
+                 */
+                _flowtuple_record_read_data(handle, *record);
+                break;
+            }
             _flowtuple_record_read_class(handle, *record);
             break;
         case 7:
