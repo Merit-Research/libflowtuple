@@ -2,7 +2,7 @@
  *  error.c
  *
  *  Copyright (c) 2018 Merit Network, Inc.
- *  Copyright (c) 2018 The Regents of the University of California.
+ *  Copyright (c) 2012 The Regents of the University of California.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
