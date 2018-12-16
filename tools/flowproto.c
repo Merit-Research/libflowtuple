@@ -62,6 +62,7 @@ int main(int argc, char *argv[]) {
     err = err == FLOWTUPLE_ERR_OK ? flowtuple_errno(handle) : err;
     if (err != FLOWTUPLE_ERR_OK) {
         fprintf(stderr, "error: %s\n", flowtuple_strerr(err));
+        flowtuple_release(handle);
         exit(err);
     }
 
