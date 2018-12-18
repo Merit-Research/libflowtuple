@@ -32,6 +32,10 @@ flowtuple_handle_t *flowtuple_initialize(const char *filename, flowtuple_errno_t
     flowtuple_errno_t local_err = FLOWTUPLE_ERR_OK;
     flowtuple_handle_t *handle = NULL;
 
+    if (filename == NULL) {
+        local_err = FLOWTUPLE_ERR_FILE_OPEN;
+        goto fail;
+    }
 
     CALLOC(handle, 1, sizeof(flowtuple_handle_t), goto nomem);
 
