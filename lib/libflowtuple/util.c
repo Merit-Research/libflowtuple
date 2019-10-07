@@ -56,13 +56,3 @@ int _flowtuple_check_magic(flowtuple_handle_t *handle) {
     FREE(buf);
     return ret;
 }
-
-uint64_t _flowtuple_bytes_to_int(const uint8_t *bytes, size_t len) {
-    uint64_t ret = 0;
-
-    for (size_t i = 0; i < len; i++) {
-        ret |= (uint64_t)(bytes[i] << (8 * (len - 1 - i)));
-    }
-
-    return ret;
-}

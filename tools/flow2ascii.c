@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <endian.h>
+#include <arpa/inet.h>
 
 #include <flowtuple.h>
 
@@ -31,13 +33,6 @@ static const struct option long_opts[] = {
     { NULL, 0, NULL, 0 },
 };
 
-/* take integer and convert to array of octets */
-void ntoa(uint32_t src, uint8_t *dest) {
-    for (int i = 0; i < 4; i++) {
-        dest[i] = (uint8_t)(src >> (8 * (3 - i)));
-    }
-}
-
 /* print header object */
 void header_print(flowtuple_header_t *header) {
     const char *traceuri;
@@ -46,18 +41,19 @@ void header_print(flowtuple_header_t *header) {
 
     printf("# CORSARO_VERSION %d.%d\n",
         flowtuple_header_get_version_major(header), flowtuple_header_get_version_minor(header));
-    printf("# CORSARO_INITTIME %d\n", flowtuple_header_get_local_init_time(header));
-    printf("# CORSARO_INTERVAL %d\n", flowtuple_header_get_interval_length(header));
+    printf("# CORSARO_INITTIME %d\n", ntohl(flowtuple_header_get_local_init_time(header)));
+    printf("# CORSARO_INTERVAL %d\n", ntohs(flowtuple_header_get_interval_length(header)));
 
     traceuri = flowtuple_header_get_traceuri(header);
     if (traceuri != NULL) {
         printf("# CORSARO_TRACEURI %s\n", traceuri);
     }
 
-    plugin_count = flowtuple_header_get_plugin_count(header);
+    plugin_count = ntohs(flowtuple_header_get_plugin_count(header));
     plugins = flowtuple_header_get_plugins(header);
     for (int i = 0; i < plugin_count; i++) {
         /* really, there's only one expected plugin */
+        /* not true, ...... */
         if (plugins[i] == FLOWTUPLE_MAGIC_SIXT || plugins[i] == FLOWTUPLE_MAGIC_SIXU) {
             printf("# CORSARO_PLUGIN flowtuple\n");
         }
@@ -68,15 +64,15 @@ void header_print(flowtuple_header_t *header) {
 void interval_print(flowtuple_interval_t *interval, int is_start) {
     char *tails[] = { "_END", "_START" };
     printf("# CORSARO_INTERVAL%s %d %d\n",
-        tails[is_start], flowtuple_interval_get_number(interval),
-        flowtuple_interval_get_time(interval));
+        tails[is_start], ntohs(flowtuple_interval_get_number(interval)),
+        ntohl(flowtuple_interval_get_time(interval)));
 }
 
 /* print trailer object */
 void trailer_print(flowtuple_trailer_t *trailer) {
-    uint64_t ac = flowtuple_trailer_get_accepted_count(trailer);
-    uint64_t dc = flowtuple_trailer_get_dropped_count(trailer);
-    printf("# CORSARO_PACKETCNT %"PRIu64"\n", flowtuple_trailer_get_packet_count(trailer));
+    uint64_t ac = be64toh(flowtuple_trailer_get_accepted_count(trailer));
+    uint64_t dc = be64toh(flowtuple_trailer_get_dropped_count(trailer));
+    printf("# CORSARO_PACKETCNT %"PRIu64"\n", be64toh(flowtuple_trailer_get_packet_count(trailer)));
 
     if (ac != UINT64_MAX) {
         printf("# CORSARO_ACCEPTEDCNT %"PRIu64"\n", ac);
@@ -86,10 +82,10 @@ void trailer_print(flowtuple_trailer_t *trailer) {
         printf("# CORSARO_DROPPEDCNT %"PRIu64"\n", dc);
     }
 
-    printf("# CORSARO_FIRSTPKT %d\n", flowtuple_trailer_get_first_packet_time(trailer));
-    printf("# CORSARO_LASTPKT %d\n", flowtuple_trailer_get_last_packet_time(trailer));
-    printf("# CORSARO_FINALTIME %d\n", flowtuple_trailer_get_local_final_time(trailer));
-    printf("# CORSARO_RUNTIME %d\n", flowtuple_trailer_get_runtime(trailer));
+    printf("# CORSARO_FIRSTPKT %d\n", ntohl(flowtuple_trailer_get_first_packet_time(trailer)));
+    printf("# CORSARO_LASTPKT %d\n", ntohl(flowtuple_trailer_get_last_packet_time(trailer)));
+    printf("# CORSARO_FINALTIME %d\n", ntohl(flowtuple_trailer_get_local_final_time(trailer)));
+    printf("# CORSARO_RUNTIME %d\n", ntohl(flowtuple_trailer_get_runtime(trailer)));
 }
 
 /* print class object */
@@ -100,7 +96,7 @@ void class_print(flowtuple_class_t *ftclass, int is_start) {
     if (is_start) {
         printf("%s %s %d\n", starts[is_start],
                class_types[flowtuple_class_get_class_type(ftclass)],
-               flowtuple_class_get_key_count(ftclass));
+               ntohl(flowtuple_class_get_key_count(ftclass)));
     } else {
         printf("%s %s\n", starts[is_start], class_types[flowtuple_class_get_class_type(ftclass)]);
     }
@@ -111,23 +107,23 @@ void data_print(flowtuple_data_t *data, uint8_t first_octet) {
     uint8_t src_ip[4];
     uint8_t dst_ip[4];
 
-    ntoa(flowtuple_data_get_dest_ip(data), dst_ip);
+    *(uint32_t*)(dst_ip) = flowtuple_data_get_dest_ip(data);
     if (flowtuple_data_is_slash_eight(data)) {
         dst_ip[0] = first_octet;
     }
 
-    ntoa(flowtuple_data_get_src_ip(data), src_ip);
+    *(uint32_t*)(src_ip) = flowtuple_data_get_src_ip(data);
 
     printf("%u.%u.%u.%u|%u.%u.%u.%u|%u|%u|%u|%u|0x%02x|%u,%u\n",
            src_ip[0], src_ip[1], src_ip[2], src_ip[3],
            dst_ip[0], dst_ip[1], dst_ip[2], dst_ip[3],
-           flowtuple_data_get_src_port(data),
-           flowtuple_data_get_dest_port(data),
+           ntohs(flowtuple_data_get_src_port(data)),
+           ntohs(flowtuple_data_get_dest_port(data)),
            flowtuple_data_get_protocol(data),
            flowtuple_data_get_ttl(data),
            flowtuple_data_get_tcp_flags(data),
-           flowtuple_data_get_ip_len(data),
-           flowtuple_data_get_packet_count(data));
+           ntohs(flowtuple_data_get_ip_len(data)),
+           ntohl(flowtuple_data_get_packet_count(data)));
 }
 
 void process_record(flowtuple_record_t *record, void *args) {

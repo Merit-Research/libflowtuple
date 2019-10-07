@@ -18,6 +18,7 @@
  */
 
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "flowtuple.h"
 #include "fttypes.h"
@@ -69,6 +70,7 @@ void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_
     uint8_t *buf = NULL;
     flowtuple_header_t header;
     int64_t wand;
+    uint16_t trace_uri_len_host;
 
     CALLOC(buf, 26, sizeof(uint8_t), goto nomem);
 
@@ -81,18 +83,19 @@ void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_
         goto fail;
     }
 
-    header.version_major = (uint8_t)_flowtuple_bytes_to_int(buf + 4, 1);
-    header.version_minor = (uint8_t)_flowtuple_bytes_to_int(buf + 5, 1);
-    header.local_init_time = (uint32_t)_flowtuple_bytes_to_int(buf + 6, 4);
-    header.interval_length = (uint16_t)_flowtuple_bytes_to_int(buf + 10, 2);
+    header.version_major = *(buf + 4);
+    header.version_minor = *(buf + 5);
+    header.local_init_time = *(uint32_t*)(buf + 6);
+    header.interval_length = *(uint16_t*)(buf + 10);
 
-    header.traceuri_len = (uint16_t)_flowtuple_bytes_to_int(buf + 12, 2);
+    header.traceuri_len = *(uint16_t*)(buf + 12);
+    trace_uri_len_host = ntohs(header.traceuri_len);
     FREE(buf);
-    if (header.traceuri_len != 0) {
-        CALLOC(buf, header.traceuri_len + 1, sizeof(uint8_t), goto nomem);
-        CALLOC(header.traceuri, header.traceuri_len + 1, sizeof(uint8_t), goto nomem);
-        wandio_read(handle->io, buf, header.traceuri_len);
-        memcpy(header.traceuri, buf, header.traceuri_len * sizeof(uint8_t));
+    if (trace_uri_len_host != 0) {
+        CALLOC(buf, trace_uri_len_host + 1, sizeof(uint8_t), goto nomem);
+        CALLOC(header.traceuri, trace_uri_len_host + 1, sizeof(uint8_t), goto nomem);
+        wandio_read(handle->io, buf, trace_uri_len_host);
+        memcpy(header.traceuri, buf, trace_uri_len_host * sizeof(uint8_t));
         FREE(buf);
     } else {
         header.traceuri = NULL;
@@ -100,7 +103,7 @@ void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_
 
     CALLOC(buf, 2, sizeof(uint8_t), return);
     wandio_read(handle->io, buf, 2);
-    header.plugin_cnt = (uint16_t)_flowtuple_bytes_to_int(buf, 2);
+    header.plugin_cnt = *(uint16_t*)(buf);
     FREE(buf);
 
     CALLOC(buf, (size_t)header.plugin_cnt * 4, sizeof(uint8_t), goto nomem);
@@ -108,7 +111,7 @@ void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_
 
     wandio_read(handle->io, buf, header.plugin_cnt * 4);
     for (size_t i = 0; i < header.plugin_cnt; i++) {
-        header.plugins[i] = (uint32_t)_flowtuple_bytes_to_int(buf + (4 * i), 4);
+        header.plugins[i] = *(uint32_t*)(buf + (4 * i));
     }
 
     record->type = FLOWTUPLE_RECORD_TYPE_HEADER;
@@ -141,8 +144,8 @@ void _flowtuple_record_read_interval(flowtuple_handle_t *handle, flowtuple_recor
         goto fail;
     }
 
-    interval.number = (uint16_t)_flowtuple_bytes_to_int(buf + 4, 2);
-    interval.time = (uint32_t)_flowtuple_bytes_to_int(buf + 6, 4);
+    interval.number = *(uint16_t*)(buf + 4);
+    interval.time = *(uint32_t*)(buf + 6);
 
     record->type = FLOWTUPLE_RECORD_TYPE_INTERVAL;
     record->record.interval = interval;
@@ -174,13 +177,13 @@ void _flowtuple_record_read_trailer(flowtuple_handle_t *handle, flowtuple_record
         goto fail;
     }
 
-    trailer.packet_cnt = _flowtuple_bytes_to_int(buf + 4, 8);
-    trailer.accepted_cnt = _flowtuple_bytes_to_int(buf + 12, 8);
-    trailer.dropped_cnt = _flowtuple_bytes_to_int(buf + 20, 8);
-    trailer.first_packet_time = (uint32_t)_flowtuple_bytes_to_int(buf + 28, 4);
-    trailer.last_packet_time = (uint32_t)_flowtuple_bytes_to_int(buf + 32, 4);
-    trailer.local_final_time = (uint32_t)_flowtuple_bytes_to_int(buf + 36, 4);
-    trailer.runtime = (uint32_t)_flowtuple_bytes_to_int(buf + 40, 4);
+    trailer.packet_cnt = *(uint64_t*)(buf + 4);
+    trailer.accepted_cnt = *(uint64_t*)(buf + 12);
+    trailer.dropped_cnt = *(uint64_t*)(buf + 20);
+    trailer.first_packet_time = *(uint32_t*)(buf + 28);
+    trailer.last_packet_time = *(uint32_t*)(buf + 32);
+    trailer.local_final_time = *(uint32_t*)(buf + 36);
+    trailer.runtime = *(uint32_t*)(buf + 40);
 
     record->type = FLOWTUPLE_RECORD_TYPE_TRAILER;
     record->record.trailer = trailer;
@@ -222,11 +225,11 @@ void _flowtuple_record_read_class(flowtuple_handle_t *handle, flowtuple_record_t
         goto fail;
     }
 
-    ftclass.magic = (uint32_t)_flowtuple_bytes_to_int(buf, 4);
-    ftclass.class_type = (uint16_t)_flowtuple_bytes_to_int(buf + 4, 2);
+    ftclass.magic = *(uint32_t*)(buf);
+    ftclass.class_type = *(uint16_t*)(buf + 4);
 
     if (is_start) {
-        ftclass.key_count = (uint32_t) _flowtuple_bytes_to_int(buf + 6, 4);
+        ftclass.key_count = *(uint32_t*)(buf + 6);
     } else {
         ftclass.key_count = 0;
     }
@@ -269,11 +272,11 @@ void _flowtuple_record_read_data(flowtuple_handle_t *handle, flowtuple_record_t 
 
     magic = last_record.record.ftclass.magic;
 
-    if (magic == 0x53495854) {
+    if (magic == 0x54584953) {
         /* SIXT */
         CALLOC(buf, 20, sizeof(uint8_t), goto nomem);
         wandio_read(handle->io, buf, 20);
-    } else if (magic == 0x53495855) {
+    } else if (magic == 0x55584953) {
         /* SIXU */
         CALLOC(buf, 21, sizeof(uint8_t), goto nomem);
         wandio_read(handle->io, buf, 21);
@@ -283,28 +286,28 @@ void _flowtuple_record_read_data(flowtuple_handle_t *handle, flowtuple_record_t 
         goto fail;
     }
 
-    data.src_ip = (uint32_t)_flowtuple_bytes_to_int(buf, 4);
+    data.src_ip = *(uint32_t*)(buf);
 
     offset = 4;
-    if (magic == 0x53495854) {
+    if (magic == 0x54584953) {
         data.has_slash_eight = 1;
-        data.dst_ip.y.b = (uint8_t)_flowtuple_bytes_to_int(buf + offset, 1);
-        data.dst_ip.y.c = (uint8_t)_flowtuple_bytes_to_int(buf + offset + 1, 1);
-        data.dst_ip.y.d = (uint8_t)_flowtuple_bytes_to_int(buf + offset + 2, 1);
+        data.dst_ip.y.b = *(buf + offset);
+        data.dst_ip.y.c = *(buf + offset + 1);
+        data.dst_ip.y.d = *(buf + offset + 2);
         offset += 3;
     } else {
         data.has_slash_eight = 0;
-        data.dst_ip.x = (uint32_t)_flowtuple_bytes_to_int(buf + offset, 4);
+        data.dst_ip.x = *(uint32_t*)(buf + offset);
         offset += 4;
     }
 
-    data.src_port = (uint16_t)_flowtuple_bytes_to_int(buf + offset, 2);
-    data.dst_port = (uint16_t)_flowtuple_bytes_to_int(buf + offset + 2, 2);
-    data.proto = (uint8_t)_flowtuple_bytes_to_int(buf + offset + 4, 1);
-    data.ttl = (uint8_t)_flowtuple_bytes_to_int(buf + offset + 5, 1);
-    data.tcp_flags = (uint8_t)_flowtuple_bytes_to_int(buf + offset + 6, 1);
-    data.ip_len = (uint16_t)_flowtuple_bytes_to_int(buf + offset + 7, 2);
-    data.pkt_cnt = (uint32_t)_flowtuple_bytes_to_int(buf + offset + 9, 4);
+    data.src_port = *(uint16_t*)(buf + offset);
+    data.dst_port = *(uint16_t*)(buf + offset + 2);
+    data.proto = *(buf + offset + 4);
+    data.ttl = *(buf + offset + 5);
+    data.tcp_flags = *(buf + offset + 6);
+    data.ip_len = *(uint16_t*)(buf + offset + 7);
+    data.pkt_cnt = *(uint32_t*)(buf + offset + 9);
 
     record->type = FLOWTUPLE_RECORD_TYPE_FLOWTUPLE_DATA;
     record->record.data = data;
