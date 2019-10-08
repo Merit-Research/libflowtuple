@@ -64,6 +64,11 @@ struct _flowtuple_class_t {
     uint16_t class_type;
     uint32_t key_count;
 
+    /* this is so we don't have to call
+     * ntohl on every creation of a
+     * data struct, once is good */
+    uint32_t key_count_host;
+
     int is_start;
 };
 
