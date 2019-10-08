@@ -49,7 +49,7 @@ void header_print(flowtuple_header_t *header) {
         printf("# CORSARO_TRACEURI %s\n", traceuri);
     }
 
-    plugin_count = ntohs(flowtuple_header_get_plugin_count(header));
+    plugin_count = flowtuple_header_get_plugin_count(header);
     plugins = flowtuple_header_get_plugins(header);
     for (int i = 0; i < plugin_count; i++) {
         /* really, there's only one expected plugin */

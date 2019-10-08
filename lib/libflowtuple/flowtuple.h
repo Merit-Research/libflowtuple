@@ -79,8 +79,8 @@ typedef enum _flowtuple_record_type_t {
 
 /** Flowtuple magics */
 typedef enum _flowtuple_magic_t {
-    FLOWTUPLE_MAGIC_SIXT = 0x53495854,
-    FLOWTUPLE_MAGIC_SIXU = 0x53495855,
+    FLOWTUPLE_MAGIC_SIXT = 0x54584953,
+    FLOWTUPLE_MAGIC_SIXU = 0x55584953,
 } flowtuple_magic_t;
 
 /** Flowtuple class types */

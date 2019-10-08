@@ -106,7 +106,7 @@ void _flowtuple_record_read_header(flowtuple_handle_t *handle, flowtuple_record_
 
     CALLOC(buf, 2, sizeof(uint8_t), return);
     wandio_read(handle->io, buf, 2);
-    header.plugin_cnt = *(uint16_t*)(buf);
+    header.plugin_cnt = ntohs(*(uint16_t*)(buf));
     FREE(buf);
 
     CALLOC(buf, (size_t)header.plugin_cnt * 4, sizeof(uint8_t), goto nomem);
