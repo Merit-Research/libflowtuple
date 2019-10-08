@@ -56,6 +56,8 @@ void header_print(flowtuple_header_t *header) {
         /* not true, ...... */
         if (plugins[i] == FLOWTUPLE_MAGIC_SIXT || plugins[i] == FLOWTUPLE_MAGIC_SIXU) {
             printf("# CORSARO_PLUGIN flowtuple\n");
+        } else if (plugins[i] == 0x414E4F4E) {
+            printf("# CORSARO_PLUGIN anon\n");
         }
     }
 }
