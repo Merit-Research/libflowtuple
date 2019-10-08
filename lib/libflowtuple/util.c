@@ -25,11 +25,11 @@
 #include "fttypes.h"
 
 int _flowtuple_check_magic(flowtuple_handle_t *handle) {
-    char *buf;
+    char buf[5];
     int ret;
     int64_t peek;
-    CALLOC(buf, 5, sizeof(char), return -1);
 
+    buf[4] = '\0';
     if ((peek = wandio_peek(handle->io, buf, 4)) == 0) {
         ret = -1; /* EOF */
     } else if (peek < 0) {
@@ -53,6 +53,5 @@ int _flowtuple_check_magic(flowtuple_handle_t *handle) {
         ret = 0;
     }
 
-    FREE(buf);
     return ret;
 }
